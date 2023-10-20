@@ -1,0 +1,106 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<div>
+    <h2>Active Listings</h2>
+    <div style="background-color:rgb(212, 212, 212) ;">
+        <div style="text-decoration: none; color:black; outline: 0px white;">
+            <div style="margin:10px; background-color: rgba(243, 243, 243, 0.955); display:inline-block; padding: 0px; border: 2px solid rgb(164, 164, 164);">
+            <div>
+                <img src= {{listingItem.image}} aria-placeholder={{listingItem.image}} style="width: 375px; height: 375px;">  
+            </div>
+            <div style="text-align:center"> 
+                <b>{{ listingItem.title }}</b>
+            </div> 
+            <div style="text-align:center">
+                <a href="/listings/category/{{ listingItem.category }}"> {{ listingItem.category }} </a>
+            </div>
+            <div style="text-align:center; width:375px; height: 20px;" > 
+                {{ listingItem.description }}
+            </div>
+            {% if listingItem.ended != True %}
+            <div style="text-align:center; width:375px; height: 20px; color: limegreen;" > 
+                <b>Active</b>
+            </div>
+            {% else %}
+            <div style="text-align:center; width:375px; height: 20px; color: red;" > 
+                <b>Not Active</b>
+            </div>
+            {% endif %}
+            <div style="text-align:center;">
+                {% if listingItem.currentWinner != "No Winner" %}
+                    <b>Current Bid:</b> ${{ listingItem.initialBid }}
+                {% else %}
+                    <b>Starting Bid:</b> ${{ listingItem.initialBid }}
+                {% endif %}
+            </div>
+            </div>
+            <div style="display:inline-block; vertical-align:top; margin-top: 10px;">
+            <br>
+            <p>Listing by {{ listingItem.creator }}</p>
+            <br>
+            {% if inWatchlist == False %}
+                <form action="{% url 'add_to_watchlist' listingItem.id %}" method="post">
+                    {% csrf_token %} 
+                    <input type="hidden" value="{{ listingItem.id }}">
+                    <input type="submit" value="Add to Watchlist">
+                </form>
+            {% else %}
+                <form action="{% url 'remove_from_watchlist' listingItem.id %}" method="post">
+                    {% csrf_token %} 
+                    <input type="hidden" value="{{ listingItem.id }}">
+                    <input type="submit" value="Remove from Watchlist">
+                </form>
+            {% endif %}
+            <br>
+            {% if listingItem.currentWinner != "No Winner" %}
+                <b>Current Bid:</b> ${{ listingItem.initialBid }} by <b>{{ listingItem.currentWinner }}</b>
+            {% else %}
+                <b>Starting Bid:</b> ${{ listingItem.initialBid }}
+            {% endif %}
+            {% if listingItem.ended != True %}
+            <form action="{% url 'addBid' %}" method="post">
+                {% csrf_token %} 
+                <br>
+                <input type="hidden" name="listingItemID" value="{{ listingItem.id }}">
+                <p1>Place A New Bid: $</p1><input type="number" name="bidAmount" step="0.01"> 
+                <input type="submit" value="Submit">
+                {% if error_msg != "" %}
+                <p1 style="color:red">Invalid Bid Amount. Bid Again.</p1>
+                {% endif %}
+            </form>
+            {% else %}
+                <br>
+                <p1 style="color:red">Bidding Has Ended.</p1>
+            {% endif %}
+            {% if listingItem.creator == user.username and listingItem.ended != True %}
+                <br>
+                <form action="{% url 'endListing' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="listingItemID" value="{{ listingItem.id }}">
+                    <input type="submit" value="End Bidding">
+                </form>
+            {% endif %}
+            {% if listingItem.ended and listingItem.currentWinner == user.username %}
+                <br>
+                <b><p1 style="color:rgb(19, 190, 19);"> You Have Won This Auction!</p1></b>
+            {% endif %}
+            <br>
+            <br>
+            <form action="{% url 'addComment' %}" method="post">
+                {% csrf_token %} 
+                <input type="hidden" name="listingItemID" value= "{{ listingItem.id }}">
+                <input type="text" name="comment" placeholder="Add a comment...">
+            </form>
+            <p1>Comments:</p1>
+            {% for y in Comment %}
+            <div>
+                <p2>{{ y.user }}: {{y.contents }}</p2>
+                <br>
+            </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

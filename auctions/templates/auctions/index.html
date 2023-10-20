@@ -1,0 +1,43 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<div>
+    <h2>{{ heading }}</h2>
+    <div>
+        {% for listing in listings %}
+        <a href="/listings/{{ listing.id }}" style="text-decoration: none; color:black; outline: 0px white;">
+            <div style="margin:10px; background-color: rgba(243, 243, 243, 0.955); display:inline-block; padding: 0px; border: 2px solid rgb(164, 164, 164);">
+            <div>
+                <img src= {{listing.image}} aria-placeholder={{listing.image}} style="width: 375px; height: 375px;">  
+            </div>
+            <div style="text-align:center"> 
+                <b>{{ listing.title }}</b>
+            </div> 
+            <div style="text-align:center">
+                <a href="/listings/category/{{ listing.category }}"> {{ listing.category }} </a>
+            </div>
+            <div style="text-align:center; width:375px; height: 20px;" > 
+                {{ listing.description }}
+            </div>
+            {% if listing.ended != True %}
+            <div style="text-align:center; width:375px; height: 20px; color: limegreen;" > 
+                <b>Active</b>
+            </div>
+            {% else %}
+            <div style="text-align:center; width:375px; height: 20px; color: red;" > 
+                <b>Not Active</b>
+            </div>
+            {% endif %}
+            <div style="text-align:center;">
+                {% if listing.currentWinner != "No Winner" %}
+                    <b>Current Bid:</b> ${{ listing.initialBid }}
+                {% else %}
+                    <b>Starting Bid:</b> ${{ listing.initialBid }}
+                {% endif %}
+            </div>
+            </div>
+        <a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
